@@ -1,0 +1,28 @@
+.play-again__wrap {
+  position: absolute;
+  padding-left: 50px;
+  left: 20px;
+  top: -5px;
+  z-index: 1;
+
+  &::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    left: 0;
+    top: 25px;
+    background-size: 40px;
+    background-image: url("../img/right-arrow.svg");
+    background-repeat: no-repeat;
+    transform: rotate(180deg);
+  }
+
+  &:hover {
+    opacity: 0.8;
+  }
+  &:focus {
+    opacity: 0.6;
+  }
+}
