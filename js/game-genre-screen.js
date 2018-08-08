@@ -1,5 +1,5 @@
 /* Модуль: Игра на выбор жанра */
-import {renderScreen,createScreenElement} from "./kernel";
+import {renderScreen, createScreenElement} from "./kernel";
 import welcomeScreen from "./welcome-screen";
 import resultWinScreen from './result-win-screen';
 import resultTimeOutScreen from './result-timeout-screen';
@@ -92,8 +92,8 @@ let gameGenreScreen = `<section class="main main--level main--level-genre">
   </section>`;
 
 gameGenreScreen = createScreenElement(gameGenreScreen);
-const playAgainButton = gameGenreScreen.querySelector(".play-again");
-playAgainButton.addEventListener("click", () => renderScreen(welcomeScreen));
+const playAgainButton = gameGenreScreen.querySelector(`.play-again`);
+playAgainButton.addEventListener(`click`, () => renderScreen(welcomeScreen));
 
 const submitButton = gameGenreScreen.querySelector(`.genre-answer-send`);
 submitButton.disabled = true;
