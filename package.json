@@ -7,7 +7,7 @@
     "eslint": "eslint ./gulpfile.js, js/",
     "build": "gulp build",
     "start": "gulp serve",
-    "test": "npm run eslint && gulp test"
+    "test": "gulp test"
   },
   "devDependencies": {
     "autoprefixer": "8.5.1",
