@@ -1,13 +1,21 @@
 export const GAME = {
   lives: 2,
   timer: 300,
-  score: 0
+  score: 0,
+  currentLevel: 0,
+  nextLevel: 1,
+  answers: []
 };
 
 const POINT = {
   correctAswer: 1,
   correcrfastAnswer: 2,
   live: 2
+};
+
+export const startNewGame = (game) => {
+  game.answers = [];
+  return Object.assign({}, game);
 };
 
 export const calculateScore = (answers, lives) => {
@@ -47,23 +55,18 @@ export const createTimer = (time) => {
   }
 
   return {
-    totalTme: time,
     timer: time,
     tick() {
-      this._interval = setInterval(() => {
+      if (this.timer !==0) {
         this.timer = this.timer - 1;
-        if (this.timer === 0) {
-          clearInterval(this._interval);
-          this.timeout();
-        }
-      }, 1000);
+      }
+      this._timeout(this.timer);
     },
 
-    timeout() {
-      this.state = `timeout`;
+    _timeout(timer) {
+      if (timer === 0) {
+        this.state = `timeout`;
+      }
     }
   };
 };
-
-const timer = createTimer(10);
-timer.tick();

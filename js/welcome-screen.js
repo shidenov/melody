@@ -1,5 +1,6 @@
-import {renderScreen, createScreenElement} from './kernel';
-import gameArtistScreen from './game-artist-screen';
+import {createScreenElement, renderScreen} from './kernel';
+import {getCurrentDataGame} from './data/music-data';
+import {gameScreen} from './game-screen';
 
 /* Приветствие */
 let welcomeScreen = `<section class="main main--welcome">
@@ -15,6 +16,12 @@ let welcomeScreen = `<section class="main main--welcome">
 
 welcomeScreen = createScreenElement(welcomeScreen);
 const buttonStart = welcomeScreen.querySelector(`.main-play`);
-buttonStart.addEventListener(`click`, () => renderScreen(gameArtistScreen));
+
+buttonStart.addEventListener(`click`, () => {
+  const currentGame = getCurrentDataGame(0);
+  const game = gameScreen(currentGame);
+
+  renderScreen(game);
+});
 
 export default welcomeScreen;

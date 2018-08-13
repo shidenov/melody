@@ -1,23 +1,31 @@
 export const GAME = {
   lives: 2,
-  timer: 300, // 1000 * 60 * 5 = 5 min
-  score: 0
+  timer: 300,
+  score: 0,
+  currentLevel: 0,
+  nextLevel: 1,
+  answers: []
 };
 
 const POINT = {
-  correctAnswer: 1,
-  correctfastAnswer: 2,
+  correctAswer: 1,
+  correcrfastAnswer: 2,
   live: 2
 };
 
+export const startNewGame = (game) => {
+  game.answers = [];
+  return Object.assign({}, game);
+};
+
 export const calculateScore = (answers, lives) => {
-  const trueAnswers = answers.filter((item) => item.result !== false);
-  if (answers.length !== 10 || trueAnswers.length < 8) {
+  const rightAnswers = answers.filter((item) => item !== false);
+  if (answers.length !== 10 || rightAnswers.length < 8) {
     return -1;
   }
 
-  const fastAnswers = trueAnswers.filter((item) => item.timer <= 30);
-  const pointAnswers = ((trueAnswers.length - fastAnswers.length) * POINT.correctAnswer) + (fastAnswers.length * POINT.correctfastAnswer);
+  const fastAnswers = rightAnswers.filter((item) => item.timer <= 30);
+  const pointAnswers = (rightAnswers.length - fastAnswers.length) * POINT.correctAswer + fastAnswers.length * POINT.correcrfastAnswer;
   const pointLives = (GAME.lives > lives) ? (GAME.lives - lives) * POINT.live : 0;
 
   return pointAnswers - pointLives;
@@ -27,52 +35,43 @@ export const calculateResult = (results, currentGame) => {
   if (currentGame.timer <= 0) {
     return `Время вышло! Вы не успели отгадать все мелодии`;
   }
-
   if (currentGame.lives < 0) {
     return `У вас закончились все попытки. Ничего, повезёт в следующий раз!`;
   }
 
-  // добавим результат игры в массив
   results.push(currentGame.score);
   const sortResults = results.sort((a, b) => b - a);
-  const place = sortResults.indexOf(currentGame.score) + 1; // место которое занял игрок
+  const place = sortResults.indexOf(currentGame.score) + 1;
   const totalGamers = sortResults.length;
   const winPercent = ((totalGamers - place) / totalGamers * 100).toFixed(0);
 
-  return `Вы заняли ${place} место из ${sortResults.length}. Это лучше чем у ${winPercent}% игроков`;
+  return `Вы заняли ${place} место из ${totalGamers}. Это лучше чем у ${winPercent}% игроков`;
 };
-
 
 export const createTimer = (time) => {
   if (typeof time === `undefined`) {
     throw new Error(`Не указан аргумент`);
   }
-
   if (typeof time !== `number`) {
     throw new Error(`Не верный тип данных, аргументом функции может быть только число`);
   }
 
   return {
-    totalTime: time,
     timer: time,
     tick() {
-      this._interval = setInterval(() => {
+      if (this.timer !== 0) {
         this.timer = this.timer - 1;
-        if (this.timer === 0) {
-          clearInterval(this._interval);
-          this.timeout();
-        }
-      }, 1000);
+      }
+      this._timeout(this.timer);
     },
 
-    timeout() {
-      this.state = `timeout`;
+    _timeout(timer) {
+      if (timer === 0) {
+        this.state = `timeout`;
+      }
     }
   };
 };
-
-const timer = createTimer(10);
-timer.tick();
 
 const assert = require(`chai`).assert;
 
@@ -89,7 +88,7 @@ describe(`Функция подсчёта набранных баллов игр
       {result: true, timer: 60},
       {result: false, timer: 60},
       {result: false, timer: 60},
-      {result: false, timer: 60},
+      {result: false, timer: 60}
     ], -1), -1);
 
     assert.equal(calculateScore([
@@ -194,7 +193,7 @@ describe(`Функция подсчёта результатов игры`, () =
   const attemptsEnd = `У вас закончились все попытки. Ничего, повезёт в следующий раз!`;
 
   it(`Подсчёт результатов: Проигрышь - закончилось время`, () => {
-    assert.equal(calculateResult([4, 5, 8, 11], {score: 10, lives: 2, timer: 0}),timeout);
+    assert.equal(calculateResult([4, 5, 8, 11], {score: 10, lives: 2, timer: 0}), timeout);
     assert.equal(calculateResult([4, 12, 8, 11, 5], {score: 5, lives: 0, timer: 0}), timeout);
     assert.equal(calculateResult([10, 5], {score: 8, lives: 1, timer: 0}), timeout);
   });
@@ -211,7 +210,8 @@ describe(`Функция подсчёта результатов игры`, () =
   });
 
   it(`Подсчёт результатов: Выигрыш`, () => {
-    assert.equal(calculateResult([4, 5, 8, 11], {score: 10, lives: 2, timer: 60}), `Вы заняли 2 место из 5. Это лучше чем у 60% игроков`);
+    assert.equal(calculateResult([4, 5, 8, 11], {score: 10, lives: 2, timer: 60}
+    ), `Вы заняли 2 место из 5. Это лучше чем у 60% игроков`);
     assert.equal(calculateResult([4, 12, 8, 11, 5], {score: 5, lives: 0, timer: 360}
     ), `Вы заняли 4 место из 6. Это лучше чем у 33% игроков`);
     assert.equal(calculateResult([10, 5], {score: 8, lives: 1, timer: 120}
@@ -231,16 +231,27 @@ describe(`Таймер`, () => {
   it(`Таймер: проверка на значения`, () => {
     const timer = createTimer(100);
     assert.equal(timer.timer, 100);
-    assert.equal(timer.totalTime, 100);
   });
 
-  it(`Таймер: проверка ассинхронности, метод tick`, function (done) {
-    const timer = createTimer(1);
+  it(`Таймер: метод tick`, () => {
+    const timer = createTimer(3);
     timer.tick();
-    setTimeout(() => {
-      assert.equal(timer.timer, 0);
-      assert.equal(timer.state, `timeout`);
-      done();
-    }, 1000);
+    assert.equal(timer.timer, 2);
+    timer.tick();
+    assert.equal(timer.timer, 1);
+    timer.tick();
+    assert.equal(timer.timer, 0);
+    assert.equal(timer.state, `timeout`);
+  });
+
+  it(`Таймер: проверка tick при timeout`, () => {
+    const timer = createTimer(2);
+    timer.tick();
+    timer.tick();
+    timer.tick();
+    timer.tick();
+
+    assert.equal(timer.timer, 0);
+    assert.equal(timer.state, `timeout`);
   });
 });
