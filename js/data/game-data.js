@@ -1,29 +1,25 @@
-export const GAME = {
+export const GAME = Object.freeze({
   lives: 2,
-  timer: 300,
+  timer: 300, // 1000 * 60 * 5 = 5 min
   score: 0,
   currentLevel: 0,
-  nextLevel: 1,
-  answers: []
-};
+  nextLevel: 1
+});
 
 const POINT = {
-  correctAswer: 1,
-  correcrfastAnswer: 2,
+  correctAnswer: 1,
+  correctfastAnswer: 2,
   live: 2
 };
 
-export const startNewGame = (game) => {
-  game.answers = [];
-  return Object.assign({}, game);
-};
-
 export const calculateScore = (answers, lives) => {
-  const rightAnswers = answers.filter((item) => item !== false);
-  if (answers.length !== 10 || rightAnswers.length < 8) return -1;
+  const trueAnswers = answers.filter((item) => item.result !== false);
+  if (answers.length !== 10 || trueAnswers.length < 8) {
+    return -1;
+  }
 
-  const fastAnswers = rightAnswers.filter((item) => item.timer <= 30);
-  const pointAnswers = (rightAnswers.length - fastAnswers.length) * POINT.correctAswer + fastAnswers.length * POINT.correcrfastAnswer;
+  const fastAnswers = trueAnswers.filter((item) => item.timer <= 30);
+  const pointAnswers = ((trueAnswers.length - fastAnswers.length) * POINT.correctAnswer) + (fastAnswers.length * POINT.correctfastAnswer);
   const pointLives = (GAME.lives > lives) ? (GAME.lives - lives) * POINT.live : 0;
 
   return pointAnswers - pointLives;
@@ -33,23 +29,26 @@ export const calculateResult = (results, currentGame) => {
   if (currentGame.timer <= 0) {
     return `Время вышло! Вы не успели отгадать все мелодии`;
   }
+
   if (currentGame.lives < 0) {
     return `У вас закончились все попытки. Ничего, повезёт в следующий раз!`;
   }
 
+  // добавим результат игры в массив
   results.push(currentGame.score);
   const sortResults = results.sort((a, b) => b - a);
-  const place = sortResults.indexOf(currentGame.score) + 1;
+  const place = sortResults.indexOf(currentGame.score) + 1; // место которое занял игрок
   const totalGamers = sortResults.length;
   const winPercent = ((totalGamers - place) / totalGamers * 100).toFixed(0);
 
-  return `Вы заняли ${place} место из ${totalGamers}. Это лучше чем у ${winPercent}% игроков`;
+  return `Вы заняли ${place} место из ${sortResults.length}. Это лучше чем у ${winPercent}% игроков`;
 };
 
 export const createTimer = (time) => {
   if (typeof time === `undefined`) {
     throw new Error(`Не указан аргумент`);
   }
+
   if (typeof time !== `number`) {
     throw new Error(`Не верный тип данных, аргументом функции может быть только число`);
   }
@@ -57,7 +56,7 @@ export const createTimer = (time) => {
   return {
     timer: time,
     tick() {
-      if (this.timer !==0) {
+      if (this.timer !== 0) {
         this.timer = this.timer - 1;
       }
       this._timeout(this.timer);
@@ -68,5 +67,30 @@ export const createTimer = (time) => {
         this.state = `timeout`;
       }
     }
+  };
+};
+
+export const convertText = (number, word, one, many, multi) => {
+  if (number === one) {
+    return word + one;
+  }
+  return (number > 1 && number < 5 && number !== 1) ? word + many : word + multi;
+};
+
+export const showTimeResult = (time) => {
+  let {min, sec} = time;
+  const minutes = convertText(+min, `минут`, `у`, `ы`, ``);
+  const seconds = convertText(+sec[1], `секунд`, `у`, `ы`, ``);
+  sec = (sec[0] === `0`) ? sec[1] : sec;
+  return `${min} ${minutes} и ${sec} ${seconds}`;
+};
+
+export const timerConvertToMinAndSec = (timer) => {
+  const minutes = Math.floor(timer / 60);
+  const seconds = ((timer % 60) / 1).toFixed(0);
+  const convertSeconds = (seconds < 10) ? `0${seconds}` : seconds;
+  return {
+    min: minutes.toString(),
+    sec: convertSeconds
   };
 };

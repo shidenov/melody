@@ -255,3 +255,45 @@ describe(`Таймер`, () => {
     assert.equal(timer.state, `timeout`);
   });
 });
+
+describe(`Жизни, попытки`, () => {
+  it(`Жизни, попытки: Проверка формы существительного ошибки`, () => {
+    assert.equal(convertText(0, `ошиб`, `ку`, `ки`, `ок`), `ошибок`);
+    assert.equal(convertText(1, `ошиб`, `ку`, `ки`, `ок`), `ошибку`);
+    assert.equal(convertText(2, `ошиб`, `ку`, `ки`, `ок`), `ошибки`);
+    assert.equal(convertText(3, `ошиб`, `ку`, `ки`, `ок`), `ошибки`);
+    assert.equal(convertText(4, `ошиб`, `ку`, `ки`, `ок`), `ошибки`);
+    assert.equal(convertText(5, `ошиб`, `ку`, `ки`, `ок`), `ошибок`);
+    assert.equal(convertText(6, `ошиб`, `ку`, `ки`, `ок`), `ошибок`);
+  });
+});
+
+describe(`Таймер - конвертация`, () => {
+  it(`Таймер: Проверка функции конвертации`, () => {
+    assert.deepEqual(timerConverToMinAndSec(300), {min: `5`, sec: `00`});
+    assert.deepEqual(timerConverToMinAndSec(22), {min: `0`, sec: `22`});
+    assert.deepEqual(timerConverToMinAndSec(150), {min: `2`, sec: `30`});
+    assert.deepEqual(timerConverToMinAndSec(48), {min: `0`, sec: `48`});
+    assert.deepEqual(timerConverToMinAndSec(188), {min: `3`, sec: `08`});
+  });
+
+  it(`Таймер: Проверка формы склонения минут и секунд`, () => {
+    const time1 = timerConverToMinAndSec(300);
+    assert.equal(showTimeResult(time1), `5 минут и 0 секунд`);
+
+    const time2 = timerConverToMinAndSec(22);
+    assert.equal(showTimeResult(time2), `0 минут и 22 секунды`);
+
+    const time3 = timerConverToMinAndSec(150);
+    assert.equal(showTimeResult(time3), `2 минуты и 30 секунд`);
+
+    const time4 = timerConverToMinAndSec(48);
+    assert.equal(showTimeResult(time4), `0 минут и 48 секунд`);
+
+    const time5 = timerConverToMinAndSec(188);
+    assert.equal(showTimeResult(time5), `3 минуты и 8 секунд`);
+
+    const time6 = timerConverToMinAndSec(61);
+    assert.equal(showTimeResult(time6), `1 минуту и 1 секунду`);
+  });
+});

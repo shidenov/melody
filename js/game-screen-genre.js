@@ -6,16 +6,16 @@ export const genreTemplate = (game) => {
   for (let i = 0; game.answers.length > i; i++) {
     const item = `
     <div class="genre-answer">
-    <div class="player-wrapper">
-    <div class="player">
-    <button class="player-control player-control--play"></button>
-    <div class="player-track">s
-    <span class="player-status"></span>
-    </div>
-    </div>
-    </div>
-    <input type="checkbox" name="answer" value="answer-${i}" id="a-${i}">
-    <label class="genre-answer-check" for="a-${i}"></label>
+      <div class="player-wrapper">
+        <div class="player">
+          <button class="player-control player-control--play"></button>
+          <div class="player-track">
+            <span class="player-status"></span>
+          </div>
+        </div>
+      </div>
+      <input type="checkbox" name="answer" value="answer-${i}" id="a-${i}">
+      <label class="genre-answer-check" for="a-${i}"></label>
     </div>
     `;
 
@@ -25,12 +25,13 @@ export const genreTemplate = (game) => {
 
   let wrap = `
   <div class="main-wrap">
-  <h2 class="title">${game.title}</h2>
-  <form class="genre">
-  ${answers.join(``)}
-  <button class="genre-answer-send" type="submit">Ответить</button>
-  </form>
-  </div>`;
+    <h2 class="title">${game.title}</h2>
+    <form class="genre">
+      ${answers.join(``)}
+      <button class="genre-answer-send" type="submit">Ответить</button>
+    </form>
+  </div>
+  `;
 
   wrap = createScreenElement(wrap);
   const players = wrap.querySelectorAll(`.player`);
