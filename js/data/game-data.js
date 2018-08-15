@@ -71,26 +71,43 @@ export const createTimer = (time) => {
 };
 
 export const convertText = (number, word, one, many, multi) => {
-  if (number === one) {
+  const checkNumber = (num) => {
+    return (num > 21) ? +(num.toString()[1]) : num;
+  };
+
+  number = checkNumber(number);
+  if (number === 1) {
     return word + one;
   }
-  return (number > 1 && number < 5 && number !== 1) ? word + many : word + multi;
+
+  if (number > 1 && number < 5) {
+    return word + many;
+  }
+  return (number > 1 && number < 5) ? word + many : word + multi;
 };
 
 export const showTimeResult = (time) => {
   let {min, sec} = time;
+
   const minutes = convertText(+min, `минут`, `у`, `ы`, ``);
-  const seconds = convertText(+sec[1], `секунд`, `у`, `ы`, ``);
+  const seconds = convertText(+sec, `секунд`, `у`, `ы`, ``);
   sec = (sec[0] === `0`) ? sec[1] : sec;
   return `${min} ${minutes} и ${sec} ${seconds}`;
 };
 
-export const timerConvertToMinAndSec = (timer) => {
+export const timerConverToMinAndSec = (timer) => {
   const minutes = Math.floor(timer / 60);
   const seconds = ((timer % 60) / 1).toFixed(0);
   const convertSeconds = (seconds < 10) ? `0${seconds}` : seconds;
+
   return {
     min: minutes.toString(),
     sec: convertSeconds
   };
+};
+
+export const getRadius = (relation, radius) => {
+  const stroke = +(2 * Math.PI * radius).toFixed();
+  const offset = +((1 - relation) * stroke).toFixed();
+  return {stroke, offset};
 };

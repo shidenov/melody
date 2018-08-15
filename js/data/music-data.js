@@ -23,7 +23,7 @@ const musicData = [
   },
   {
     artist: `Riot`,
-    name: ` Level Plane`,
+    name: `	Level Plane`,
     image: `https://i.ytimg.com/vi/jzgM3m8Vp1k/maxresdefault.jpg`,
     src: `https://www.youtube.com/audiolibrary_download?vid=dfb828f40096184c`,
     genre: `R&B`

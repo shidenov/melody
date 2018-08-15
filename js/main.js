@@ -1,7 +1,7 @@
 /* Импорт Модулей */
-import {renderScreen} from './kernel';
-import welcomeScreen from './welcome-screen';
+import {startGame} from './game-screen';
 
-renderScreen(welcomeScreen);
+/* start game */
+startGame();
 
 import './data/game-data';
