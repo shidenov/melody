@@ -1,7 +1,8 @@
 /* Импорт Модулей */
-import {startGame} from './game-screen';
+import Application from './application';
 
 /* start game */
-startGame();
+export const development = true;
+Application.start();
 
 import './data/game-data';

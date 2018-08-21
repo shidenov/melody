@@ -1,6 +1,6 @@
-import AbstractView from './abstract-view';
-import {development} from './main';
-import {getAudioTrack} from './data/music-data';
+import AbstractView from '../abstract-view';
+import Music from '../data/music-data';
+import {development} from '../main';
 
 export default class GenreView extends AbstractView {
   constructor(game) {
@@ -9,9 +9,9 @@ export default class GenreView extends AbstractView {
   }
 
   get template() {
-    const answers = [];
-    for (let i = 0; this.game.answers.length > i; i++) {
-      const status = (development) ? `<span style="color: black">${this.game.answers[i].result()}</span>` : ``;
+    const answersTemplate = [];
+    this.game.answers.forEach((answer, i) => {
+      const status = (development) ? `<span style="color: black">${answer.result()}</span>` : ``;
       const item = `
       <div class="genre-answer">
         <div class="player-wrapper">
@@ -28,15 +28,15 @@ export default class GenreView extends AbstractView {
       `;
 
       item.trim();
-      answers.push(item);
-    }
+      answersTemplate.push(item);
+    });
 
     return `
       <section class="main main--level main--level-${this.game.gameType}">
         <div class="main-wrap">
           <h2 class="title">${this.game.title}</h2>
           <form class="genre">
-            ${answers.join(``)}
+            ${answersTemplate.join(``)}
             <button class="genre-answer-send" type="submit">Ответить</button>
           </form>
         </div>
@@ -47,36 +47,38 @@ export default class GenreView extends AbstractView {
   onResult() { }
 
   bind() {
-    const players = this.element.querySelectorAll(`.player`);
+    const playerElements = this.element.querySelectorAll(`.player`);
     const audioTracks = [];
 
     this.game.answers.forEach((answer, i) => {
-      const track = getAudioTrack(answer.src);
+      const track = Music.getAudioTrack(answer.src);
       audioTracks.push(track);
+      const buttonControlElement = playerElements[i].querySelector(`.player-control`);
 
-      const buttonControl = players[i].querySelector(`.player-control`);
       if (i === 0) {
-        track.play();
-        buttonControl.classList.remove(`player-control--play`);
-        buttonControl.classList.add(`player-control--pause`);
+        buttonControlElement.classList.remove(`player-control--play`);
+        buttonControlElement.classList.add(`player-control--pause`);
       }
 
-      buttonControl.addEventListener(`click`, (event) => {
+      buttonControlElement.addEventListener(`click`, (event) => {
         const e = event || window.event;
         const target = e.target || e.srcElement;
 
         // отключать все треки и включать выбранный
         audioTracks.forEach((audio) => audio.pause());
         // добавить всем кнопкам класс play
-        for (let player of players) {
+        for (let player of playerElements) {
           const control = player.querySelector(`.player-control`);
-          control.classList.remove(`player-control--pause`);
-          control.classList.add(`player-control--play`);
+          if (target !== control) {
+            control.classList.remove(`player-control--pause`);
+            control.classList.add(`player-control--play`);
+          }
         }
 
         if ([...target.classList].indexOf(`player-control--pause`) !== -1) {
           target.classList.remove(`player-control--pause`);
           target.classList.add(`player-control--play`);
+          track.pause();
         } else {
           target.classList.remove(`player-control--play`);
           target.classList.add(`player-control--pause`);
@@ -87,8 +89,10 @@ export default class GenreView extends AbstractView {
       });
     });
 
-    const submitButton = this.element.querySelector(`.genre-answer-send`);
-    submitButton.disabled = true;
+    audioTracks[0].play();
+
+    const submitButtonElement = this.element.querySelector(`.genre-answer-send`);
+    submitButtonElement.disabled = true;
 
     const resultAnswers = {};
     const answerItems = [...this.element.querySelectorAll(`.genre-answer-check`)];
@@ -107,11 +111,11 @@ export default class GenreView extends AbstractView {
           delete resultAnswers[currentAnswerIndex];
         }
 
-        submitButton.disabled = Object.keys(resultAnswers).length === 0;
+        submitButtonElement.disabled = Object.keys(resultAnswers).length === 0;
       });
     }
 
-    submitButton.addEventListener(`click`, (e) => {
+    submitButtonElement.addEventListener(`click`, (e) => {
       e.preventDefault();
       for (let key in resultAnswers) {
         if (!resultAnswers[key]) {
@@ -119,7 +123,10 @@ export default class GenreView extends AbstractView {
         }
       }
 
-      audioTracks.forEach((audio) => audio.pause());
+      if (Object.keys(resultAnswers).length !== this.game.correct.length) {
+        return this.onResult(false);
+      }
+
       return this.onResult(true);
     });
   }

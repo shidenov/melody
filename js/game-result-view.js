@@ -9,8 +9,9 @@ export default class ResultView extends AbstractView {
 
   get template() {
     let template;
+
     if (this.game.score !== -1) {
-      const timer = timerConverToMinAndSec(300 - this.game.timer);
+      const timer = timerConverToMinAndSec(300 - this.game.timer.time);
       const timeText = showTimeResult(timer);
 
       const lives = (this.game.lives - 2) * -1;
@@ -30,7 +31,7 @@ export default class ResultView extends AbstractView {
       `;
     }
 
-    if (this.game.resultGame === `У вас закончились все попытки. Ничего, повезёт в следующий раз!`) {
+    if (this.game.resultGame === `У вас зако��чились все попытки. Ничего, повезёт в следующий раз!`) {
       template = `
         <section class="main main--result">
           <section class="logo" title="Угадай мелодию"><h1>Угадай мелодию</h1></section>
@@ -50,6 +51,10 @@ export default class ResultView extends AbstractView {
           <span role="button" tabindex="0" class="main-replay">Попробовать ещё раз</span>
         </section>
       `;
+    }
+
+    if (typeof template === `undefined`) {
+      throw new Error(`Не могу отобразить результат, ошибка данных`);
     }
 
     return template;

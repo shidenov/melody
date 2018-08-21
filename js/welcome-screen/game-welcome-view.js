@@ -1,4 +1,4 @@
-import AbstractView from './abstract-view';
+import AbstractView from '../abstract-view';
 
 export default class WelcomeView extends AbstractView {
   constructor() {
@@ -26,6 +26,6 @@ export default class WelcomeView extends AbstractView {
 
   bind() {
     this.buttonStartElement = this.element.querySelector(`.main-play`);
-    this.buttonStartElement.style.borderLeftColor = `#bbb`;
+    this.buttonStartElement.classList.add(`disable`);
   }
 }

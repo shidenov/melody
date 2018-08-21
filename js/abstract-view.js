@@ -3,9 +3,8 @@ const render = (html) => {
   template.innerHTML = html;
   if (template.content.children.length > 1) {
     return template.content;
-  } else {
-    return template.content.firstElementChild;
   }
+  return template.content.firstElementChild;
 };
 
 export default class AbstractView {

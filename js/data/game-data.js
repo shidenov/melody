@@ -1,15 +1,28 @@
+export const TIMER = 300; // 5 min
+
 export const GAME = Object.freeze({
   lives: 2,
-  timer: 300, // 1000 * 60 * 5 = 5 min
+  currentTimer: TIMER,
   score: 0,
   currentLevel: 0,
   nextLevel: 1
 });
 
-const POINT = {
-  correctAnswer: 1,
-  correctfastAnswer: 2,
-  live: 2
+export const QuestionType = {
+  GENRE: `genre`,
+  ARTIST: `artist`
+};
+
+export const ResultGame = {
+  WIN: `win`,
+  NOLIVES: `noLives`,
+  TIMEOUT: `timeout`
+};
+
+const Point = {
+  CORRECT_ANSWER: 1,
+  CORRECT_FAST_ANSWER: 2,
+  LIVE: 2
 };
 
 export const calculateScore = (answers, lives) => {
@@ -19,14 +32,14 @@ export const calculateScore = (answers, lives) => {
   }
 
   const fastAnswers = trueAnswers.filter((item) => item.timer <= 30);
-  const pointAnswers = ((trueAnswers.length - fastAnswers.length) * POINT.correctAnswer) + (fastAnswers.length * POINT.correctfastAnswer);
-  const pointLives = (GAME.lives > lives) ? (GAME.lives - lives) * POINT.live : 0;
+  const pointAnswers = ((trueAnswers.length - fastAnswers.length) * Point.CORRECT_ANSWER) + (fastAnswers.length * Point.CORRECT_FAST_ANSWER);
+  const pointLives = (GAME.lives > lives) ? (GAME.lives - lives) * Point.LIVE : 0;
 
   return pointAnswers - pointLives;
 };
 
 export const calculateResult = (results, currentGame) => {
-  if (currentGame.timer <= 0) {
+  if (currentGame.timer.time <= 0) {
     return `Время вышло! Вы не успели отгадать все мелодии`;
   }
 
@@ -54,16 +67,16 @@ export const createTimer = (time) => {
   }
 
   return {
-    timer: time,
+    time,
     tick() {
-      if (this.timer !== 0) {
-        this.timer = this.timer - 1;
+      if (this.time !== 0) {
+        this.time = this.time - 1;
       }
-      this._timeout(this.timer);
+      this._timeout(this.time);
     },
 
-    _timeout(timer) {
-      if (timer === 0) {
+    _timeout(currentTime) {
+      if (currentTime === 0) {
         this.state = `timeout`;
       }
     }
@@ -87,12 +100,12 @@ export const convertText = (number, word, one, many, multi) => {
 };
 
 export const showTimeResult = (time) => {
-  let {min, sec} = time;
+  const {min, sec} = time;
 
-  const minutes = convertText(+min, `минут`, `у`, `ы`, ``);
-  const seconds = convertText(+sec, `секунд`, `у`, `ы`, ``);
-  sec = (sec[0] === `0`) ? sec[1] : sec;
-  return `${min} ${minutes} и ${sec} ${seconds}`;
+  const minutesText = convertText(+min, `минут`, `у`, `ы`, ``);
+  const secondsText = convertText(+sec, `секунд`, `у`, `ы`, ``);
+  const seconds = (sec[0] === `0`) ? sec[1] : sec;
+  return `${min} ${minutesText} и ${seconds} ${secondsText}`;
 };
 
 export const timerConverToMinAndSec = (timer) => {

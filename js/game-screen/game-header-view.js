@@ -1,5 +1,5 @@
-import AbstractView from './abstract-view';
-import {getRadius, timerConverToMinAndSec} from './data/game-data';
+import AbstractView from '../abstract-view';
+import {getRadius, timerConverToMinAndSec, TIMER} from '../data/game-data';
 
 /* header template */
 export default class HeaderView extends AbstractView {
@@ -41,12 +41,14 @@ export default class HeaderView extends AbstractView {
     playAgainButton.addEventListener(`click`, this.onClick);
   }
 
+  // публичный метод, используется в game-screen
   convertTime() {
     return timerConverToMinAndSec(this.state.timer.time);
   }
 
+  // публичный метод, используется в game-screen
   getSvgAttrOptions() {
-    const timerRelation = this.state.timer.time / 300;
+    const timerRelation = this.state.timer.time / TIMER;
     return getRadius(timerRelation, 370);
   }
 }
